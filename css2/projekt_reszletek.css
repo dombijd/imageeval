@@ -74,7 +74,7 @@ h3 {
 /* leírás */
 .project-description {  
   margin: 10px 0; /* tetején és alján margó */
-  max-height: 100px; /* max magasság */
+ /* max-height: 100px; /* max magasság */
   overflow: hidden; /* elrejti ha túl sok */
   text-overflow: ellipsis; /* ... a végére, ha a szöveg túl hosszú */
   line-height: 1.5; /* sor magassága  */

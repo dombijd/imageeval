@@ -6,15 +6,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 // Kapcsolódás az adatbázishoz
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "szakdoga";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Kapcsolódás hiba: " . $conn->connect_error);
-}
+require_once "db_connect.php";
 
 // Projekt ID lekérése URL-ből
 $projektId = $_GET['id'];
@@ -70,7 +62,7 @@ while ($fileData = $filesResult->fetch_assoc()) {
     // Fájl elérési útja
     $filePath = "../feltoltesek/" . $fileData['fajl_nev'];  // Fájl elérési útja
     $fileExtension = pathinfo($fileData['fajl_nev'], PATHINFO_EXTENSION);  // Fájl kiterjesztése
-    $fileUrl = "http://localhost/szakdolgozat31/feltoltesek/" . $fileData['fajl_nev']; // Alapértelmezett fájl URL
+    $fileUrl = "../feltoltesek/" . $fileData['fajl_nev']; // Alapértelmezett fájl URL
 
     if (file_exists($filePath)) {
         // Ha a fájl képfájl (pl. jpg, png, gif), akkor képet adunk hozzá

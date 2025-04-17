@@ -48,18 +48,7 @@
 
     <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $servername = "localhost";
-        $username = "root"; // A XAMPP alapértelmezett felhasználója
-        $password = ""; // A XAMPP alapértelmezett jelszava
-        $dbname = "szakdoga";
-
-        // Kapcsolódás az adatbázishoz
-        $conn = new mysqli($servername, $username, $password, $dbname);
-
-        // Ellenőrzés
-        if ($conn->connect_error) {
-            die("Kapcsolódás hiba: " . $conn->connect_error);
-        }
+        require_once "db_connect.php";
 
         // Regisztrációs űrlap adatok
         $felhasznalonev = $conn->real_escape_string($_POST['username']);
@@ -79,7 +68,7 @@
             echo "<script>alert('A felhasználónév már foglalt. Kérlek válassz másikat!');</script>";
         } elseif ($checkEmailResult->num_rows > 0) {
             // Ha az e-mail cím már regisztrálva van
-            echo "<script>alert('Ez az email cím már regisztrálva van!');</script>";
+            echo "<script>alert('Ez az e-mail cím már regisztrálva van!');</script>";
         } else {
             // Ha nincs probléma, akkor végrehajtjuk a regisztrációt
             $sql = "INSERT INTO felhasznalok (felhasznalonev, email, jelszo) 

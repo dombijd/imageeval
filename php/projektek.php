@@ -31,15 +31,7 @@
 
     <div class="container">
         <?php
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname = "szakdoga";
-
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        if ($conn->connect_error) {
-            die("Kapcsolódás hiba: " . $conn->connect_error);
-        }
+        require_once "db_connect.php";
 
         // Frissített lekérdezés, hogy az eddigi_kitoltesek mezőt is kiválassza
         $sql = "SELECT id, nev, leiras, fokep, eddigi_kitoltesek FROM projektek";
@@ -49,12 +41,12 @@
             while ($row = $result->fetch_assoc()) {
                 echo '<div class="project-box" id="project-box-small">';
                 echo '<a href="nyilvanos_reszletek.php?projekt_id=' . urlencode($row['id']) . '">';
-                echo '<img src="/szakdolgozat31/feltoltesek/' . htmlspecialchars($row['fokep']) . '" alt="' . htmlspecialchars($row['nev']) . '">';
+                echo '<img src="../feltoltesek/' . htmlspecialchars($row['fokep']) . '" alt="' . htmlspecialchars($row['nev']) . '">';
 
                 // Projekt neve rövidítése, ha túl hosszú
                 $projectName = htmlspecialchars($row['nev']);
-                if (strlen($projectName) > 10) {  // 30 karakterre rövidítjük, ez állítható igény szerint
-                    $projectName = substr($projectName, 0, 10) . '...';
+                if (strlen($projectName) > 17) {  // 30 karakterre rövidítjük, ez állítható igény szerint
+                    $projectName = substr($projectName, 0, 17) . '...';
                 }
 
                 echo '<div class="project-name"><a href="nyilvanos_reszletek.php?projekt_id=' . urlencode($row['id']) . '">' . $projectName . '</a></div>'; // Linkként visszaállítva

@@ -104,7 +104,7 @@ form {
 
 /* ha már kijelötem melyik pontozást akarom */
 .pontozas-kor.selected {
-  background-color: red; /* háttér legyen piros */
+  background-color: green; /* háttér maradjon zöld */
   color: white; /* szám benne fehér */
 }
 

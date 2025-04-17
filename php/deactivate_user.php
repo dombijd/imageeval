@@ -1,38 +1,24 @@
 <?php
-session_start(); // Itt kezdődik a session, csak egyszer!
-
-// Ellenőrizzük, hogy az admin be van-e jelentkezve
+session_start();
+// ell. hogy admin e
 if (!isset($_SESSION['felhasznalonev']) || $_SESSION['felhasznalonev'] !== 'admin') {
-    // Ha nem admin van bejelentkezve, átirányítjuk a bejelentkezési oldalra
+    // ha nem admin akkor visszadobni bejelre
     header('Location: bejelentkezes.php');
     exit();
 }
-
-if (isset($_GET['id'])) {
+if (isset($_GET['id'])) { //ell az id-t
     $userId = $_GET['id'];
+    // adatb kapcs
+    require_once "db_connect.php";
 
-    // Adatbázis kapcsolat beállítása
-    $servername = "localhost";
-    $username = "root"; // XAMPP alapértelmezett felhasználó
-    $password = ""; // XAMPP alapértelmezett jelszó
-    $dbname = "szakdoga";
-
-    // Adatbázis kapcsolódás létrehozása
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    // Kapcsolódás ellenőrzése
-    if ($conn->connect_error) {
-        die("Kapcsolódás hiba: " . $conn->connect_error);
-    }
-
-    // Ellenőrizzük, hogy létezik-e a felhasználó
+    // létezik e a felhaszn.
     $sql = "SELECT felhasznalonev FROM felhasznalok WHERE id = '$userId'";
     $result = $conn->query($sql);
     if ($result->num_rows > 0) {
-        // Frissítjük a letiltva mezőt TRUE értékre
+        // a letiltvat atallitjuk igazra
         $updateSql = "UPDATE felhasznalok SET letiltva = TRUE WHERE id = '$userId'";
         if ($conn->query($updateSql) === TRUE) {
-            // Sikeres frissítés után visszairányítás
+            // felhasznalok php oldal
             header("Location: felhasznalok.php");
             exit();
         } else {
@@ -41,8 +27,7 @@ if (isset($_GET['id'])) {
     } else {
         echo "Nincs ilyen felhasználó.";
     }
-
-    // Adatbázis kapcsolat lezárása
+    // adatbkapcs lezárása
     $conn->close();
 } else {
     echo "Nem adtál meg felhasználó ID-t.";

@@ -1,14 +1,6 @@
 <?php
 // Az adatbázis kapcsolat beállítása
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "szakdoga";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Kapcsolódás hiba: " . $conn->connect_error);
-}
+require_once "db_connect.php";
 
 // Projekt ID lekérdezése
 $projekt_id = isset($_GET['id']) ? $_GET['id'] : null;

@@ -7,17 +7,11 @@ if (!isset($_SESSION['felhasznalonev'])) {
     exit();
 }
 
-// Adatbázis kapcsolat beállítása
-$servername = "localhost"; // Adatbázis szerver
-$username = "root"; // Felhasználónév
-$password = ""; // Jelszó
-$dbname = "szakdoga"; // Adatbázis neve
 
-// Kapcsolódás az adatbázishoz
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Kapcsolódás hiba: " . $conn->connect_error); // Hibaüzenet, ha nem sikerül a kapcsolat
-}
+
+// Adatbázis kapcsolat beállítása
+require_once "db_connect.php";
+
 
 // Projekt ID lekérdezése a GET paraméterből
 $projektId = $_GET['id'];
@@ -35,6 +29,16 @@ $mediaResult = $conn->query($sqlMedia);
 $sqlQuestions = "SELECT * FROM kerdesek WHERE projekt_id = '$projektId'";
 $questionsResult = $conn->query($sqlQuestions);
 
+// Már meglévő kérdések lekérdezése
+$letezoKerdesek = [];
+$kerdesQuery = "SELECT DISTINCT kerdes FROM kerdesek WHERE kerdes NOT IN (SELECT kerdes FROM kerdesek WHERE projekt_id = '$projektId')";
+
+
+$kerdesEredmeny = $conn->query($kerdesQuery);
+while ($row = $kerdesEredmeny->fetch_assoc()) {
+    $letezoKerdesek[] = $row['kerdes'];
+}
+
 // Form kezelés POST kérés esetén
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Csak akkor frissítjük az adatokat, ha az új mezők nem üresek
@@ -44,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Borítókép kezelése
     if (!empty($_FILES['fokep']['name'])) {
         $fokep = $_FILES['fokep']['name']; // Borítókép neve
-        move_uploaded_file($_FILES['fokep']['tmp_name'], "C:/xampp/htdocs/szakdolgozat31/feltoltesek/" . $fokep); // Fájl feltöltése
+        move_uploaded_file($_FILES['fokep']['tmp_name'], "../feltoltesek/" . $fokep); // Fájl feltöltése
     } else {
         $fokep = $project['fokep']; // Ha nincs új kép, megtartjuk a régit
     }
@@ -52,14 +56,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Médiafájlok feltöltése
 if (!empty($_FILES['media']['name'][0])) {
     foreach ($_FILES['media']['name'] as $key => $name) {
-        $targetPath = "C:/xampp/htdocs/szakdolgozat31/feltoltesek/" . basename($name); // Célmappa
+        $targetPath = "../feltoltesek/" . basename($name); // Célmappa
         move_uploaded_file($_FILES['media']['tmp_name'][$key], $targetPath); // Fájl feltöltése
         
         // Fájl típusának meghatározása
         $fileType = ''; // Kezdetben üres string
         if (strpos($name, '.mp4') !== false || strpos($name, '.webm') !== false) {
             $fileType = 'video';
-        } elseif (strpos($name, '.jpg') !== false || strpos($name, '.png') !== false) {
+        } elseif (strpos($name, '.jpg') !== false || strpos($name, '.png') !== false || strpos($name, '.jpeg') !== false) {
             $fileType = 'kep';
         } elseif (strpos($name, '.mp3') !== false || strpos($name, '.wav') !== false) {
             $fileType = 'audio';
@@ -82,7 +86,7 @@ if (!empty($_FILES['media']['name'][0])) {
             $fileName = $resultFileName->fetch_assoc()['fajl_nev'];
 
             // Fájl törlése a feltöltések mappából
-            $filePath = "C:/xampp/htdocs/szakdolgozat31/feltoltesek/" . $fileName;
+            $filePath = "../feltoltesek/" . $fileName;
             if (file_exists($filePath)) {
                 unlink($filePath); // Fájl törlése
             }
@@ -92,21 +96,26 @@ if (!empty($_FILES['media']['name'][0])) {
             $conn->query($sqlDelete);
         }
     }
-    if (!empty($_POST['new_questions'])) {
-        foreach ($_POST['new_questions'] as $newQuestion) {
-            if (!empty($newQuestion['kerdes'])) {
-                $kerdes = $newQuestion['kerdes'];
-                $tipus = $newQuestion['valasz_tipus'];
-                $lehetseges_valaszok = !empty($newQuestion['lehetseges_valaszok']) ? $newQuestion['lehetseges_valaszok'] : null;
-                $required = isset($newQuestion['required']) ? 1 : 0;
+    // Az új kérdések feldolgozása
+if (!empty($_POST['new_questions'])) {
+    foreach ($_POST['new_questions'] as $newQuestion) {
+        if (!empty($newQuestion['kerdes']) || !empty($newQuestion['kerdes_select'])) {
+            // Ha van választott kérdés, akkor a választott kérdést mentjük el
+            $kerdes = !empty($newQuestion['kerdes_select']) ? $newQuestion['kerdes_select'] : $newQuestion['kerdes'];
+            $tipus = $newQuestion['valasz_tipus'];
+            $lehetseges_valaszok = !empty($newQuestion['lehetseges_valaszok']) ? $newQuestion['lehetseges_valaszok'] : null;
+            $required = isset($newQuestion['required']) ? 1 : 0;
 
-                $stmt = $conn->prepare("INSERT INTO kerdesek (kerdes, valasz_tipus, lehetseges_valaszok, required, projekt_id) VALUES (?, ?, ?, ?, ?)");
-                $stmt->bind_param("sssii", $kerdes, $tipus, $lehetseges_valaszok, $required, $projektId);
-                $stmt->execute();
-                $stmt->close();
-            }
+            $stmt = $conn->prepare("INSERT INTO kerdesek (kerdes, valasz_tipus, lehetseges_valaszok, required, projekt_id) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("sssii", $kerdes, $tipus, $lehetseges_valaszok, $required, $projektId);
+            $stmt->execute();
+            $stmt->close();
         }
     }
+}
+
+    
+    
 
     // Kérdések frissítése
     if (!empty($_POST['edit_questions'])) {
@@ -114,14 +123,15 @@ if (!empty($_FILES['media']['name'][0])) {
             $kerdes = $questionData['kerdes'];
             $tipus = $questionData['valasz_tipus'];
             $lehetseges_valaszok = isset($questionData['lehetseges_valaszok']) ? $questionData['lehetseges_valaszok'] : null;
-            $required = isset($questionData['v']) ? 1 : 0;
-
+            $required = isset($questionData['required']) ? 1 : 0;
+    
             $stmt = $conn->prepare("UPDATE kerdesek SET kerdes = ?, valasz_tipus = ?, lehetseges_valaszok = ?, required = ? WHERE id = ?");
             $stmt->bind_param("ssssi", $kerdes, $tipus, $lehetseges_valaszok, $required, $questionId);
             $stmt->execute();
             $stmt->close();
         }
     }
+    
     // Kérdés törlése előtt töröljük a kapcsolódó válaszokat
     if (!empty($_POST['delete_questions'])) {
         foreach ($_POST['delete_questions'] as $questionId) {
@@ -139,6 +149,7 @@ if (!empty($_FILES['media']['name'][0])) {
             $stmtDeleteQuestion->close();
         }
     }
+    
 
     // Kérdések törlése
     if (!empty($_POST['delete_questions'])) {
@@ -169,7 +180,7 @@ if (!empty($_FILES['media']['name'][0])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projekt Módosítása</title>
     <link rel="stylesheet" href="../css2/kezdolap.css?v=1.5"> <!-- Külső CSS fájlok -->
-    <link rel="stylesheet" href="../css2/modositas.css?v=1.">
+    <link rel="stylesheet" href="../css2/modositas.css?v=1.5">
     
 </head>
 <style>
@@ -228,13 +239,13 @@ if (!empty($_FILES['media']['name'][0])) {
                         <div class="media-item">
                             <?php if (strpos($media['fajl_nev'], '.jpg') !== false || strpos($media['fajl_nev'], '.png') !== false): ?>
                                 <!-- Kép fájl -->
-                                <img src="http://localhost/szakdolgozat31/feltoltesek/<?php echo htmlspecialchars($media['fajl_nev']); ?>" alt="<?php echo htmlspecialchars($media['fajl_nev']); ?>">
+                                <img src="../feltoltesek/<?php echo htmlspecialchars($media['fajl_nev']); ?>" alt="<?php echo htmlspecialchars($media['fajl_nev']); ?>">
  <?php elseif (strpos($media['fajl_nev'], '.mp4') !== false || strpos($media['fajl_nev'], '.webm') !== false): ?>
                                 <!-- Videó fájl -->
                                 <?php if ($videoCount < 3): ?>
                                     <div class="video-container">
                                     <video width="200" controls>
-    <source src="http://localhost/szakdolgozat31/feltoltesek/<?php echo htmlspecialchars($media['fajl_nev']); ?>" type="video/<?php echo pathinfo($media['fajl_nev'], PATHINFO_EXTENSION); ?>">
+    <source src="../feltoltesek/<?php echo htmlspecialchars($media['fajl_nev']); ?>" type="video/<?php echo pathinfo($media['fajl_nev'], PATHINFO_EXTENSION); ?>">
     A böngésződ nem támogatja a videólejátszást.
 </video>
 
@@ -274,7 +285,7 @@ if (!empty($_FILES['media']['name'][0])) {
                 ?>
                     <div class="media-item">
                         <?php if (strpos($media['fajl_nev'], '.jpg') !== false || strpos($media['fajl_nev'], '.png') !== false): ?>
-                            <img src="http://localhost/szakdolgozat31/feltoltesek/<?php echo htmlspecialchars($media['fajl_nev']); ?>" alt="<?php echo htmlspecialchars($media['fajl_nev']); ?>">
+                            <img src="../feltoltesek/<?php echo htmlspecialchars($media['fajl_nev']); ?>" alt="<?php echo htmlspecialchars($media['fajl_nev']); ?>">
  <?php else: ?>
                             <p><?php echo htmlspecialchars($media['fajl_nev']); ?></p>
                         <?php endif; ?>
@@ -304,13 +315,13 @@ if (!empty($_FILES['media']['name'][0])) {
                 <select name="edit_questions[<?php echo $question['id']; ?>][valasz_tipus]" 
                         id="edit_questions_<?php echo $question['id']; ?>_tipus" 
                         onchange="toggleEnumOptions(this)">
-                    <option value="int" <?php echo ($question['valasz_tipus'] === 'int') ? 'selected' : ''; ?>>Int</option>
-                    <option value="enum" <?php echo ($question['valasz_tipus'] === 'enum') ? 'selected' : ''; ?>>Enum</option>
+                    <option value="int" <?php echo ($question['valasz_tipus'] === 'int') ? 'selected' : ''; ?>>Szám</option>
+                    <option value="enum" <?php echo ($question['valasz_tipus'] === 'enum') ? 'selected' : ''; ?>>Választásos</option>
                     <option value="text" <?php echo ($question['valasz_tipus'] === 'text') ? 'selected' : ''; ?>>Szöveg</option>
                 </select>
 
                 <div class="enum-options" style="display: <?php echo ($question['valasz_tipus'] === 'enum') ? 'block' : 'none'; ?>;">
-                    <label for="edit_questions_<?php echo $question['id']; ?>_enum">Választék (enum esetén):</label>
+                    <label for="edit_questions_<?php echo $question['id']; ?>_enum">Választék (választásos esetén):</label>
                     <input type="text" name="edit_questions[<?php echo $question['id']; ?>][lehetseges_valaszok]" 
                         id="edit_questions_<?php echo $question['id']; ?>_enum" 
                         value="<?php echo htmlspecialchars($question['lehetseges_valaszok'] ?? ''); ?>" 
@@ -321,7 +332,7 @@ if (!empty($_FILES['media']['name'][0])) {
                 <input type="checkbox" name="edit_questions[<?php echo $question['id']; ?>][required]" 
                     id="edit_questions_<?php echo $question['id']; ?>_kotelezo"
                     <?php echo $question['required'] ? 'checked' : ''; ?>>
-                <button type="button" id="remove-button" onclick="removeQuestion(this)">Eltávolítás</button>
+                <button type="button" class="remove-button" onclick="removeQuestion(this)">Eltávolítás</button>
                 <input type="hidden" name="delete_questions[]" value="<?php echo $question['id']; ?>" class="delete-flag" disabled>
             </div>
         <?php endwhile; ?>
@@ -334,45 +345,76 @@ if (!empty($_FILES['media']['name'][0])) {
 </div>
 
 <script>
+const existingQuestions = <?php echo json_encode($letezoKerdesek); ?>
+
 function addQuestion() {
-    const questionsDiv = document.getElementById("questions");
     const questionContainer = document.createElement('div');
     questionContainer.classList.add('question-container');
 
-    // Helyes referencia a stílusokhoz
-    questionContainer.style.border = "1px solid #ddd";
-    questionContainer.style.padding = "10px";
-    questionContainer.style.marginBottom = "10px";
-    questionContainer.style.borderRadius = "5px";
-    
     const index = document.querySelectorAll('.question-container').length;
-    
+
+    const optionsHTML = existingQuestions.map(q => `<option value="${q}">${q}</option>`).join(''); // Létező kérdések legördülő
+
     questionContainer.innerHTML = `
-        <label for="new_questions[${index}][kerdes]">Kérdés:</label>
-        <input type="text" name="new_questions[${index}][kerdes]" required>
+        <label>Kérdés:</label>
+<select class="custom-question-select" onchange="toggleCustomQuestion(this, ${index})">
+    <option value="">-- Új kérdés --</option>
+    ${optionsHTML}
+</select>
+<input type="text" name="new_questions[${index}][kerdes]" required placeholder="Írd be az új kérdést">
+
+<!-- A kérdésválasztás nélküli típus beállítása -->
+<input type="hidden" name="new_questions[${index}][kerdes_select]" value="" id="kerdes_select_${index}">
+
         
-        <label for="new_questions[${index}][valasz_tipus]">Típus:</label>
-        <select name="new_questions[${index}][valasz_tipus]" onchange="toggleEnumOptions(this)">
-            <option value="int">Int</option>
-            <option value="enum">Enum</option>
+        <label for="type">Típus:</label>
+        <select name="new_questions[${index}][valasz_tipus]" required onchange="toggleRequiredField(this)">
+            <option value="int">Szám</option>
+            <option value="enum">Választásos</option>
             <option value="text">Szöveg</option>
+            <option value="date">Dátum</option> <!-- Új lehetőség a dátumhoz -->
         </select>
-        
+
         <div class="enum-options" style="display: none;">
-            <label for="new_questions[${index}][lehetseges_valaszok]">Választék (enum esetén):</label>
+            <label for="options">Választék (választásos esetén):</label>
             <input type="text" name="new_questions[${index}][lehetseges_valaszok]" placeholder="Példa: Igen, Nem">
         </div>
+        <div class="date-options" style="display: none;">
+            <label for="date_input_${index}">Dátum:</label>
+            <input type="date" name="new_questions[${index}][date]" id="date_input_${index}">
+        </div>
 
-        <!-- Kötelező-e mező -->
-        <label for="new_questions[${index}][required]">Kötelező?</label>
-        <input type="checkbox" name="new_questions[${index}][required]">
-        
-        <button type="button" onclick="removeQuestion(this)">Eltávolítás</button>
+        <label for="required">Kötelező?</label>
+        <input type="checkbox" name="new_questions[${index}][required]" onchange="toggleRequiredField(this)">
+
+        <button type="button" class="remove-button" onclick="removeQuestion(this)">Eltávolítás</button>
     `;
-    
-    // Kérdés hozzáadása a DOM-ba
-    questionsDiv.appendChild(questionContainer);
+
+    document.getElementById('questions').appendChild(questionContainer);
 }
+
+function toggleRequiredField(selectElem) {
+    const container = selectElem.closest('.question-container');
+    const dateOptions = container.querySelector('.date-options');
+    
+    // Ha a válasz típusa "date" akkor jelenítjük meg a dátum input mezőt
+    if (selectElem.value === 'date') {
+        dateOptions.style.display = 'block';
+    } else {
+        dateOptions.style.display = 'none';
+    }    
+}
+function toggleRequiredField(elem) {
+    const questionContainer = elem.closest('.question-container');
+    const enumOptions = questionContainer.querySelector('.enum-options');
+
+    if (elem.tagName === 'SELECT') {
+        // Ha a válasz típusa 'enum', akkor a válaszlehetőségek input mezőjét jelenítjük meg
+        enumOptions.style.display = elem.value === 'enum' ? 'block' : 'none';
+    }
+}
+
+
 
 
 function removeQuestion(button) {
@@ -386,10 +428,23 @@ function removeQuestion(button) {
     }
 }
 
-function toggleEnumOptions(select) {
-    const enumOptions = select.closest('.question-container').querySelector('.enum-options');
-    enumOptions.style.display = select.value === 'enum' ? 'block' : 'none';
-}
+function toggleCustomQuestion(selectElem, index) {
+        const container = selectElem.closest('.question-container');
+        const input = container.querySelector(`input[name="new_questions[${index}][kerdes]"]`);
+        const hiddenInput = container.querySelector(`#kerdes_select_${index}`);
+
+        if (selectElem.value !== "") {
+            input.value = selectElem.value;  // A legördülő listából választott kérdés beállítása
+            input.disabled = true; // Ha van kiválasztott kérdés, ne lehessen szerkeszteni
+            hiddenInput.value = selectElem.value; // Az elrejtett mezőbe is beírjuk
+        } else {
+            input.value = ""; // Ha nincs kiválasztott kérdés, a mezőt töröljük
+            input.disabled = false; // Ha nincs választás, akkor szerkeszthető
+            hiddenInput.value = ""; // Az elrejtett mező törlésre kerül
+        }
+    }
+
+
 // Új ablak megnyitása az összes médiafájl megjelenítéséhez
 document.getElementById('show-all-media').onclick = function() {
     // Új ablakot nyitunk a médiafájlok megjelenítéséhez

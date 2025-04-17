@@ -9,16 +9,7 @@ if (!isset($_SESSION['felhasznalonev']) || $_SESSION['felhasznalonev'] !== 'admi
 if (isset($_GET['id'])) {
     $userId = $_GET['id'];
 
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "szakdoga";
-
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    if ($conn->connect_error) {
-        die("Kapcsolódás hiba: " . $conn->connect_error);
-    }
+    require_once "db_connect.php";
 
     $sql = "UPDATE felhasznalok SET letiltva = FALSE WHERE id = '$userId'";
     if ($conn->query($sql) === TRUE) {

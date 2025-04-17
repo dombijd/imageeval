@@ -8,15 +8,7 @@ if (!isset($_SESSION['felhasznalonev'])) {
 }
 
 // Kapcsolódás az adatbázishoz
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "szakdoga";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Kapcsolódás hiba: " . $conn->connect_error);
-}
+require_once "db_connect.php";
 
 $messages = []; // Hiba és sikerüzenetek tárolása
 
@@ -87,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
     <script>
+        const existingQuestions = <?php echo json_encode($letezoKerdesek); ?>
         function addQuestion() {
             const questionContainer = document.createElement('div');
             questionContainer.classList.add('question-container');

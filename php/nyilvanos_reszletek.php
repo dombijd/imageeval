@@ -31,16 +31,7 @@
 
     <div class="container">
         <?php
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname = "szakdoga";
-
-        // Kapcsolódás az adatbázishoz
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        if ($conn->connect_error) {
-            die("Kapcsolódás hiba: " . $conn->connect_error);
-        }
+        require_once "db_connect.php";
 
         // Ellenőrizzük, hogy van-e projekt_id
         if (isset($_GET['projekt_id'])) {

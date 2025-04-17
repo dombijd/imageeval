@@ -13,7 +13,9 @@
 .remove-question {
   cursor: pointer; /* egér */
   color: white; /* piros */
-  background-color: red;
+  background-color: red;/* piros háttér */
+  margin-top: 10px; /* margó fent */
+  border-radius: 5px; /* lekerekített sarkok */
 }
 /* kérdés eltávolítása ha fölé visszük az egeret */
 .remove-question:hover{
@@ -25,6 +27,7 @@ button {
   width: 40%; /* szélesség */
   background-color: #4ca750; /* zöld háttér */
   color: white; /* fehér szöveg */
+  border-radius: 5px; /* lekerekített sarkok */
 }
 /* új kérdés hozzáadás gomb ha fölé visszük az egeret */
 button:hover {
@@ -35,4 +38,10 @@ button:hover {
   width: 150px; /* kisebb szélesség */
   padding: 5px; /* belső térköz */
   font-size: 14px; /* betűméret */
+}
+.custom-question-select {
+  width: 80%;
+  padding: 5px;
+  font-size: 1rem;
+  border-radius: 5px;
 }

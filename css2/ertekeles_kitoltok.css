@@ -38,12 +38,15 @@ form {
   flex-direction: column; /* egymás alá */
   gap: 15px; /* térköz*/
 }
-
+/* instrukció 
+.instructions{
+  margin-bottom: 10px; 
+}*/
 /* kérdéstípusok */
 input[type="text"],
 input[type="number"],
 select {
-  width: 100%; /* teljes szélesség */
+  width: 90%; /* teljes szélesség */
   padding: 10px; /* 10px belső margó */
   border: 1px solid #ccc; /* világos szürke szegély */
   border-radius: 4px; /* lekerekített sarkok */
@@ -111,3 +114,24 @@ select {
 .button-container button {
   margin-right: 10px; /* 10px térköz a gombok között */
 }
+
+.checkbox-container {
+  margin-bottom: 20px; /* margó a checkbox konténer alján */
+  padding: 10px 0; /* felső és alsó padding */
+}
+
+.checkbox-container label {
+  display: inline-block;
+  margin-right: 10px; /* Különbség a link és a checkbox között */
+}
+
+.checkbox-container a {
+  margin-bottom: 5px; /* Térköz a link és a checkbox között */
+  display: inline-block; /* Az A tag blokkszintű elemmé válik */
+  color: #007BFF; /* Link színe */
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-right: 5px; /* Kis térköz a checkbox és a label között */
+}
+

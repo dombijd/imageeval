@@ -9,18 +9,7 @@ if (!isset($_SESSION['felhasznalonev']) || $_SESSION['felhasznalonev'] !== 'admi
 }
 
 // Adatbázis kapcsolat beállítása
-$servername = "localhost";
-$username = "root"; // XAMPP alapértelmezett felhasználó
-$password = ""; // XAMPP alapértelmezett jelszó
-$dbname = "szakdoga";
-
-// Adatbázis kapcsolódás létrehozása
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Kapcsolódás ellenőrzése
-if ($conn->connect_error) {
-    die("Kapcsolódás hiba: " . $conn->connect_error);
-}
+require_once "db_connect.php";
 
 // SQL lekérdezés a projektek lekérésére
 $sql = "SELECT 

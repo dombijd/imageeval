@@ -7,15 +7,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 
 // Kapcsolódás az adatbázishoz
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "szakdoga";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Kapcsolódás hiba: " . $conn->connect_error);
-}
+require_once "db_connect.php";
 
 // Projekt ID lekérése URL-ből
 $projektId = $_GET['id'];
@@ -84,7 +76,7 @@ while ($fileData = $filesResult->fetch_assoc()) {
         $drawing->setWorksheet($filesSheet);
 
         // Fájlra mutató hiperhivatkozás beállítása
-        $fileUrl = "http://localhost/szakdolgozat31/feltoltesek/" . $fileData['fajl_nev']; // A teljes URL
+        $fileUrl = "../feltoltesek/" . $fileData['fajl_nev']; // A teljes URL
 
         // Hiperhivatkozás az új oszlopba
         $filesSheet->setCellValue('E' . $row, 'Megnyitás');

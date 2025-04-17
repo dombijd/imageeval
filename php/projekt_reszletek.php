@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projekt Részletek - Projektértékelő</title>
     <link rel="stylesheet" href="../css2/kezdolap.css?v=1.1">
-    <link rel="stylesheet" href="../css2/projekt_reszletek.css?v=1.2">
+    <link rel="stylesheet" href="../css2/projekt_reszletek.css?v=1.4">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
@@ -40,16 +40,7 @@
         }
 
         // Kapcsolódás az adatbázishoz
-        $servername = "localhost";
-        $username = "root";
-        $password = "";
-        $dbname = "szakdoga";
-
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        if ($conn->connect_error) {
-            die("Kapcsolódás hiba: " . $conn->connect_error);
-        }
-
+        require_once "db_connect.php";
         // Projekt ID lekérése URL-ből
         $projektId = $_GET['id'];
 
@@ -85,7 +76,7 @@
                 if ($fileType == 'kep') {
                     // Kép fájlok kezelése
                     echo '<div class="media-item">';
-                    echo '<img src="/szakdolgozat31/feltoltesek/' . htmlspecialchars($fileName) . '" alt="' . htmlspecialchars($fileName) . '">';
+                    echo '<img src="../feltoltesek/' . htmlspecialchars($fileName) . '" alt="' . htmlspecialchars($fileName) . '">';
                     echo '</div>';
                     $mediaCount++;
                 } elseif ($fileType == 'video') {
@@ -94,7 +85,7 @@
                     if (in_array($ext, ['mp4', 'webm', 'ogg'])) {
                         echo '<div class="media-item">';
                         echo '<video controls>';
-                        echo '<source src="/szakdolgozat31/feltoltesek/' . htmlspecialchars($fileName) . '" type="video/' . $ext . '">';
+                        echo '<source src="../feltoltesek/' . htmlspecialchars($fileName) . '" type="video/' . $ext . '">';
                         echo 'A böngésződ nem támogatja a videó lejátszást.';
                         echo '</video>';
                         echo '</div>';
@@ -223,7 +214,7 @@
             echo '<div class="top-kepek">';
             while ($kep = $topKepekResult->fetch_assoc()) {
                 echo '<div class="top-kep">';
-                echo '<img src="/szakdolgozat31/feltoltesek/' . htmlspecialchars($kep['fajl_nev']) . '" alt="Legjobbra értékelt kép">';
+                echo '<img src="../feltoltesek/' . htmlspecialchars($kep['fajl_nev']) . '" alt="Legjobbra értékelt kép">';
                 echo '<p>Átlagos értékelés: ' . number_format($kep['atlag_pontszam'], 2) . '</p>';
                 echo '</div>';
             }

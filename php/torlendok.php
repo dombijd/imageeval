@@ -8,16 +8,7 @@ if (!isset($_SESSION['felhasznalonev'])) {
 }
 
 // Adatbázis kapcsolat beállítása
-$servername = "localhost"; // Adatbázis szerver
-$username = "root"; // Felhasználónév
-$password = ""; // Jelszó
-$dbname = "szakdoga"; // Adatbázis neve
-
-// Kapcsolódás az adatbázishoz
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Kapcsolódás hiba: " . $conn->connect_error); // Hibaüzenet, ha nem sikerül a kapcsolat
-}
+require_once "db_connect.php";
 
 // Médiafájlok lekérdezése
 $sqlMedia = "SELECT * FROM fajlok WHERE projekt_id = ?";
@@ -42,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_files'])) {
                 $fileName = $resultFileName->fetch_assoc()['fajl_nev'];
 
                 // Fájl törlése a feltöltések mappából
-                $filePath = "feltoltesek/" . $fileName;
+                $filePath = "../feltoltesek/" . $fileName;
                 if (file_exists($filePath)) {
                     unlink($filePath); // Fájl törlése
                 }
@@ -74,8 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_files'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Médiafájlok Törlése</title>
-    <link rel="stylesheet" href="../css/kezdolap.css"> <!-- Külső CSS fájlok -->
-    <link rel="stylesheet" href="../css/modositas.css">
+    <link rel="stylesheet" href="../css2/kezdolap.css"> <!-- Külső CSS fájlok -->
+   <!-- <link rel="stylesheet" href="../css/modositas.css">-->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -161,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_files'])) {
             <div class="media-preview">
                 <?php while ($media = $resultMedia->fetch_assoc()): ?>
                     <div class="media-item">
-                        <?php if (strpos($media['fajl_nev'], '.jpg') !== false || strpos($media['fajl_nev'], '.png') !== false): ?>
+                        <?php if (strpos($media['fajl_nev'], '.jpg') !== false || strpos($media['fajl_nev'], '.jpeg') !== false || strpos($media['fajl_nev'], '.png') !== false): ?>
                             <img src="../feltoltesek/<?php echo htmlspecialchars($media['fajl_nev']); ?>"
                                 alt="<?php echo htmlspecialchars($media['fajl_nev']); ?>">
                         <?php elseif (strpos($media['fajl_nev'], '.mp4') !== false || strpos($media['fajl_nev'], '.webm') !== false): ?>

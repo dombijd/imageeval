@@ -16,10 +16,7 @@ if ($kitolto_id === null) {
 }
 
 // Adatbázis kapcsolat
-$conn = new mysqli("localhost", "root", "", "szakdoga");
-if ($conn->connect_error) {
-    die("Kapcsolódási hiba: " . $conn->connect_error);
-}
+require_once "db_connect.php";
 
 // Fájlok betöltése session-be, ha még nincs
 if (!isset($_SESSION['files_images_' . $projekt_id]) || !isset($_SESSION['files_videos_' . $projekt_id])) {
@@ -132,16 +129,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pontszam'])) {
 
     }
 
-    // Ha a 10. fájl értékelésénél járunk
-    if ($current_file == 10) {
-        echo '<!DOCTYPE html>
+    // Számoljuk ki a fájlok felét
+$felso_hatar = ceil($total_files / 2);
+
+// Ha a fájlok száma legalább 10, és épp a felénél vagyunk, akkor jelenítsük meg az üzenetet
+if ($total_files >= 10 && $current_file == $felso_hatar) {
+    echo '<!DOCTYPE html>
     <html lang="hu">
     <head>
         <meta charset="UTF-8">
         <title>Félúton jársz</title>
         <link rel="stylesheet" href="../css2/ertekeles_fajlok.css?v=1.1">
         <style>
-            /* Reszponzív és stilizált félúton jársz üzenet */
             #tovabbi-ertekeles {
                 display: flex;
                 flex-direction: column;
@@ -151,18 +150,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pontszam'])) {
                 margin-top: 50px;
                 text-align: center;
             }
-
             #tovabbi-ertekeles p {
                 font-weight: bold;
                 margin-bottom: 20px;
             }
-
             #tovabbi-ertekeles .button-container {
                 display: flex;
                 gap: 20px;
                 justify-content: center;
             }
-
             #tovabbi-ertekeles .button {
                 background-color: #007BFF;
                 color: white;
@@ -173,7 +169,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pontszam'])) {
                 cursor: pointer;
                 transition: background-color 0.3s;
             }
-
             #tovabbi-ertekeles .button:hover {
                 background-color: #0056b3;
             }
@@ -186,16 +181,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pontszam'])) {
         <div id="tovabbi-ertekeles">
             <p>A fájlok felénél jársz, tarts ki!</p>
             <img src="../oldalra_kepek/thank you memes.jpg" alt="Motiváló üzenet" style="max-width: 400px; height: auto; padding: 20px; margin-bottom:20px;">
-        
             <div class="button-container">
-                <a href="fajlok_ertekelese.php?projekt_id=' . $projekt_id . '&current_file=11" class="button">Tovább a 11. fájlhoz</a>
+                <a href="fajlok_ertekelese.php?projekt_id=' . $projekt_id . '&current_file=' . ($current_file + 1) . '" class="button">Tovább a következő fájlhoz</a>
             </div>
         </div>
-
     </body>
     </html>';
-        exit();  // Ne folytassa a normál fájl értékelést
-    }
+    exit();  // Az üzenet után ne folytassa a normál fájl értékelést
+}
 
     // Következő fájlra lépés
     header("Location: fajlok_ertekelese.php?projekt_id=$projekt_id&current_file=" . ($current_file + 1));
@@ -213,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pontszam'])) {
 <head>
     <meta charset="UTF-8">
     <title>Értékelés - Projektértékelő</title>
-    <link rel="stylesheet" href="../css2/ertekeles_fajlok.css?v=1.2">
+    <link rel="stylesheet" href="../css2/ertekeles_fajlok.css?v=1.4">
     <style>
         /* Alap stílusok, ha szükséges */
     </style>
@@ -224,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pontszam'])) {
         <h1>Köszönöm, hogy értékelésével segíti a szakdolgozatomat</h1>
     </header>
     <div class="container">
-        <p>Kérjük, értékelje a fájlt!</p>
+        <p>Kérjük, értékelje a fájlt!</p> <strong>1-es a legrosszabb értékelés, 5-ös a legjobb értékelés.</strong> 
         <h3><?php echo "$current_file / $total_files"; ?></h3>
 
         <?php

@@ -41,23 +41,26 @@
   text-decoration: none; /* nincs aláhúzást */
   cursor: pointer; /* egér */
 }
-/* táblázat*/
-table {  
-  border: 5px solid black; /* szegély */
-  margin-left: auto; /* középre */
-  margin-right: auto; /* középre */
+/* táblázat */
+table {
+  width: 80%; /* szélesség */
+  margin-left: auto; /* középre, bal automatikus margó */
+  margin-right: auto; /* Közép, jobb automatikus margó */
+  border: 5px solid black; /* keret */
   border-collapse: collapse; /* cellák közötti vonalak összevonása */
 }
+
 /* fejléc, cellák */
 th,
-td {  
-  border: 1px solid black; /* szegély */
-  padding: 8px; /* cellák közötti tér */
+td {
+  border: 1px solid black; /* keret */
+  padding: 8px; /* belső térköz*/
   text-align: center; /* középre */
 }
-/* fejléc */
-th {  
-  background-color: white; /* fehér háttér */
+
+/* fejléc*/
+th {
+  background-color: #f2f2f2; /* világos szürke háttér */
 }
 /* export konténer */
 .export-container {  

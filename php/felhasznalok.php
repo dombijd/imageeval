@@ -9,18 +9,7 @@ if (!isset($_SESSION['felhasznalonev']) || $_SESSION['felhasznalonev'] !== 'admi
 }
 
 // Adatbázis kapcsolat beállítása
-$servername = "localhost";
-$username = "root"; // XAMPP alapértelmezett felhasználó
-$password = ""; // XAMPP alapértelmezett jelszó
-$dbname = "szakdoga";
-
-// Adatbázis kapcsolódás létrehozása
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Kapcsolódás ellenőrzése
-if ($conn->connect_error) {
-    die("Kapcsolódás hiba: " . $conn->connect_error);
-}
+require_once "db_connect.php";
 
 // SQL lekérdezés a felhasználók lekérésére, az admin felhasználó kiszűrésével
 $sql = "SELECT id, felhasznalonev, email, letiltva FROM felhasznalok WHERE felhasznalonev != 'admin'";
@@ -67,7 +56,7 @@ $result = $conn->query($sql);
                 <tr>
                     <th>Felhasználónév</th>
                     <th>Email cím</th>
-                    <th>Akciók</th>
+                    <th>Letiltás</th>
                 </tr>
             </thead>
             <tbody>
