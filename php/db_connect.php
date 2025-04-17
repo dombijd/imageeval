@@ -1,7 +1,7 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
+$servername = "imageeval.mysql.database.azure.com";
+$username = "annAdmin";
+$password = "FvhrFnjHzgF32!";
 $dbname = "szakdoga";
 
 // Kapcsolódás az adatbázishoz
