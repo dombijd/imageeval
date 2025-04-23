@@ -1,8 +1,8 @@
 <?php
-$servername = "imageeval.mysql.database.azure.com";
-$username = "annAdmin";
-$password = "FvhrFnjHzgF32!";
-$dbname = "szakdoga";
+$servername = env('AZURE_MYSQL_HOST');
+$username = env('AZURE_MYSQL_USERNAME');
+$password = env('AZURE_MYSQL_PASSWORD');
+$dbname = env('AZURE_MYSQL_DBNAME');
 
 echo $servername;
 echo $username;
