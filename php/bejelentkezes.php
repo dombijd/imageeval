@@ -55,7 +55,7 @@
                 // jelszo ell a hashelttel
                 if (password_verify($jelszo, $row['jelszo'])) {
                     // ha sikerült bejel akkor session inditasa
-                    session_start();
+                    @session_start();
                     $_SESSION['felhasznalo_id'] = $row['id']; // felhaszn azonosítójának tárolása a session-ben
                     $_SESSION['felhasznalonev'] = $felhasznalonev; // felhasznnév tárolása a session-ben
                     // ha admin akkor admin oldalra menjen

@@ -29,7 +29,7 @@
 
     <div class="container">
         <?php
-        session_start(); // Session indítása
+        @session_start(); // Session indítása
         
         // Ellenőrzés, hogy a felhasználó be van-e jelentkezve
         if (!isset($_SESSION['felhasznalonev'])) {

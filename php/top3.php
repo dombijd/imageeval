@@ -1,5 +1,5 @@
 <?php
-session_start();
+@session_start();
 
 // Adatbázis kapcsolat
 require_once "db_connect.php";

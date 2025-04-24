@@ -1,5 +1,5 @@
 <?php
-session_start();
+@session_start();
 
 // Ellenőrizzük, hogy az admin be van-e jelentkezve
 if (!isset($_SESSION['felhasznalonev']) || $_SESSION['felhasznalonev'] !== 'admin') {

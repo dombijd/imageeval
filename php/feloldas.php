@@ -1,5 +1,5 @@
 <?php
-session_start();
+@session_start();
 
 if (!isset($_SESSION['felhasznalonev']) || $_SESSION['felhasznalonev'] !== 'admin') {
     header('Location: bejelentkezes.php');

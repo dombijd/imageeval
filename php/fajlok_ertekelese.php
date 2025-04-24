@@ -1,5 +1,5 @@
 <?php
-session_start();
+@session_start();
 
 // Projekt ID ellenőrzése
 $projekt_id = isset($_GET['projekt_id']) ? intval($_GET['projekt_id']) : null;

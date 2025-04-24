@@ -1,5 +1,5 @@
 <?php
-session_start();
+@session_start();
 
 // Ellenőrzés, hogy a felhasználó be van-e jelentkezve
 if (!isset($_SESSION['felhasznalonev'])) {

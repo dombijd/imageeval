@@ -1,5 +1,5 @@
 <?php
-session_start(); // Session indítása
+@session_start(); // Session indítása
 ob_start(); // Kimenet pufferelése
 
 ?>
