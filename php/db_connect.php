@@ -2,7 +2,7 @@
 $servername = "imageeval.mysql.database.azure.com";
 $username = "annaAdmin";
 $password = "FvhrFnjHzgF32!";
-$dbname = "szakdoga";
+$dbname = "szakdoga2";
 
 
 // Kapcsolódás az adatbázishoz
