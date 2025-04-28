@@ -29,7 +29,7 @@
 
     <div class="container">
         <?php
-        @session_start(); // Session indítása
+        session_start(); // Session indítása
         
         require '../vendor/autoload.php'; // Autoload Composer packages
         

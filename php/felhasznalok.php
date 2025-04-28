@@ -1,5 +1,5 @@
 <?php
-@session_start(); // Itt kezdődik a session, csak egyszer!
+session_start();
 
 // Ellenőrizzük, hogy az admin be van-e jelentkezve
 if (!isset($_SESSION['felhasznalonev']) || $_SESSION['felhasznalonev'] !== 'admin') {
@@ -39,16 +39,12 @@ $result = $conn->query($sql);
             <a href="../html/kezdolap.html">Kijelentkezés</a>
         </div>
     </header>
-
-    <!-- Navigációs menü -->
     <nav>
         <ul>
             <li><a href="osszesprojekt.php">Összes projekt</a></li>
             <li><a href="felhasznalok.php">Felhasználók</a></li>
         </ul>
     </nav>
-
-    <!-- Container a felhasználók megjelenítéséhez -->
     <div class="container">
         <h2>Felhasználók</h2>
         <table>
@@ -70,7 +66,7 @@ $result = $conn->query($sql);
                         $userId = $row['id'];
                         $isDeactivated = $row['letiltva'];
 
-                        // Akciók URL-je és gomb szövege
+                        // letilt felold gomb
                         $actionUrl = $isDeactivated ? "feloldas.php?id=$userId" : "deactivate_user.php?id=$userId";
                         $buttonClass = $isDeactivated ? "activate" : "deactivate";
                         $buttonText = $isDeactivated ? "Feloldás" : "Letiltás";

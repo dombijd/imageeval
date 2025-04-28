@@ -1,5 +1,5 @@
 <?php
-@session_start();
+session_start();
 
 // Adatbázis kapcsolat
 require_once "db_connect.php";
@@ -104,15 +104,10 @@ $conn->close();
             text-align: center;
             margin: 50px;
             background-image: url('../oldalra_kepek/hatterkep.jfif');
-            /* Háttérkép elérési útvonala */
             background-size: cover;
-            /* A kép lefedi az egész ablakot */
             background-position: center;
-            /* Középre igazított kép */
             background-repeat: no-repeat;
-            /* Nincs ismétlés */
             background-attachment: fixed;
-            /* Fixált háttérkép */
         }
 
         .top-media {

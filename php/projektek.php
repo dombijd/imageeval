@@ -45,7 +45,7 @@
 
                 // Projekt neve rövidítése, ha túl hosszú
                 $projectName = htmlspecialchars($row['nev']);
-                if (strlen($projectName) > 17) {  // 30 karakterre rövidítjük, ez állítható igény szerint
+                if (strlen($projectName) > 17) {  // 17 karakterre rövidítjük, ez állítható igény szerint
                     $projectName = substr($projectName, 0, 17) . '...';
                 }
 

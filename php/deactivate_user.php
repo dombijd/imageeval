@@ -1,5 +1,5 @@
 <?php
-@session_start();
+session_start();
 // ell. hogy admin e
 if (!isset($_SESSION['felhasznalonev']) || $_SESSION['felhasznalonev'] !== 'admin') {
     // ha nem admin akkor visszadobni bejelre

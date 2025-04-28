@@ -1,5 +1,5 @@
 <?php
-@session_start();
+session_start();
 
 // Projekt ID ellenőrzése
 $projekt_id = isset($_GET['projekt_id']) ? intval($_GET['projekt_id']) : null;
@@ -52,7 +52,7 @@ if ($current_file > $total_files) {
 
 // Aktuális fájl adatainak lekérése
 if ($current_file <= count($files_images)) {
-    $rowFajl = $files_images[$current_file - 1]; // 1-alapú indexálás miatt -1
+    $rowFajl = $files_images[$current_file - 1]; // 1-alapú index miatt -1
 } else {
     $rowFajl = $files_videos[$current_file - count($files_images) - 1]; // Videó fájlok
 }
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pontszam'])) {
         'pontszam' => $pontszam
     ];
 
-    // Értékelések számának frissítése minden fájlnál!
+    // Értékelések számának frissítése minden fájlnál
     $update_fajl = $conn->prepare("UPDATE fajlok SET ertekelesek_szama = ertekelesek_szama + 1 WHERE id = ?");
     $update_fajl->bind_param("i", $fajl_id);
     $update_fajl->execute();
@@ -187,7 +187,7 @@ if ($total_files >= 10 && $current_file == $felso_hatar) {
         </div>
     </body>
     </html>';
-    exit();  // Az üzenet után ne folytassa a normál fájl értékelést
+    exit(); 
 }
 
     // Következő fájlra lépés
@@ -207,9 +207,6 @@ if ($total_files >= 10 && $current_file == $felso_hatar) {
     <meta charset="UTF-8">
     <title>Értékelés - Projektértékelő</title>
     <link rel="stylesheet" href="../css2/ertekeles_fajlok.css?v=1.4">
-    <style>
-        /* Alap stílusok, ha szükséges */
-    </style>
 </head>
 
 <body>
@@ -221,19 +218,19 @@ if ($total_files >= 10 && $current_file == $felso_hatar) {
         <h3><?php echo "$current_file / $total_files"; ?></h3>
 
         <?php
-        // Ellenőrizze, hogy a fájl videó-e
+        // Ellenőrzés, hogy a fájl videó-e
         $file_extension = pathinfo($rowFajl['fajl_nev'], PATHINFO_EXTENSION);
         $video_extensions = ['mp4', 'webm', 'ogg']; // Támogatott videó kiterjesztések
         
         if (in_array(strtolower($file_extension), $video_extensions)) {
             // Ha videó, akkor <video> tag
             echo '<video width="600" controls>
-                <source src="/szakdolgozat31/feltoltesek/' . htmlspecialchars($rowFajl['fajl_nev']) . '" type="video/' . $file_extension . '">
+                <source src="../feltoltesek/' . htmlspecialchars($rowFajl['fajl_nev']) . '" type="video/' . $file_extension . '">
                 Your browser does not support the video tag.
               </video>';
         } else {
             // Ha kép, akkor <img> tag
-            echo '<img src="/szakdolgozat31/feltoltesek/' . htmlspecialchars($rowFajl['fajl_nev']) . '" alt="Fájl kép" width="600">';
+            echo '<img src="../feltoltesek/' . htmlspecialchars($rowFajl['fajl_nev']) . '" alt="Fájl kép" width="600">';
         }
         ?>
 
@@ -241,20 +238,20 @@ if ($total_files >= 10 && $current_file == $felso_hatar) {
             <input type="hidden" name="fajl_id" value="<?php echo $rowFajl['id']; ?>">
             <input type="hidden" name="pontszam" id="pontszam-hidden" value="" />
             <div class="pontozas-container">
-                <?php for ($i = 1; $i <= 5; $i++): ?>
+                <?php for ($i = 1; $i <= 5; $i++): ?>   <!-- A pontozás gombok megjelenítése 1-től 5-ig -->
                     <button type="button" class="pontozas-kor"
                         onclick="selectRating(<?php echo $i; ?>)"><?php echo $i; ?></button>
                 <?php endfor; ?>
             </div>
-            <button type="submit" id="tovabb-gomb">Tovább</button>
+            <button type="submit" id="tovabb-gomb">Tovább</button> <!-- Tovább gomb, csak akkor jelenik meg, ha ki van választva egy pontszámot -->
         </form>
     </div>
     <script>
         function selectRating(rating) {
-            document.getElementById('pontszam-hidden').value = rating;
-            document.querySelectorAll('.pontozas-kor').forEach(circle => circle.classList.remove('selected'));
-            document.querySelector('.pontozas-kor:nth-child(' + rating + ')').classList.add('selected');
-            document.getElementById('tovabb-gomb').style.display = 'block';
+            document.getElementById('pontszam-hidden').value = rating; // A kiválasztott pontszám értékének beállítása a rejtett input mezőben
+            document.querySelectorAll('.pontozas-kor').forEach(circle => circle.classList.remove('selected')); // Az összes pontozás gomb állapotának resetelése
+            document.querySelector('.pontozas-kor:nth-child(' + rating + ')').classList.add('selected'); // A kiválasztott gomb kiemelése
+            document.getElementById('tovabb-gomb').style.display = 'block'; // A Tovább gomb megjelenítése, ha pontszámot választottak
         }
     </script>
 </body>

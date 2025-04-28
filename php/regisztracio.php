@@ -55,11 +55,11 @@
         $email = $conn->real_escape_string($_POST['email']);
         $jelszo = password_hash($_POST['password'], PASSWORD_DEFAULT); // Jelszó titkosítása
     
-        // Ellenőrizd, hogy a felhasználónév már létezik-e
+        // Ellenőrzés, hogy a felhasználónév már létezik-e
         $checkUsernameSql = "SELECT * FROM felhasznalok WHERE felhasznalonev = '$felhasznalonev'";
         $checkUsernameResult = $conn->query($checkUsernameSql);
 
-        // Ellenőrizd, hogy az e-mail cím már regisztrálva van-e
+        // Ellenőrzés, hogy az e-mail cím már regisztrálva van-e
         $checkEmailSql = "SELECT * FROM felhasznalok WHERE email = '$email'";
         $checkEmailResult = $conn->query($checkEmailSql);
 

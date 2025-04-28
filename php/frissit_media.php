@@ -11,7 +11,7 @@ if ($projekt_id === null) {
 
 // Képek és videók lekérdezése
 $query = "SELECT * FROM fajlok WHERE projekt_id = ? ORDER BY id ASC LIMIT 5"; // Az első 5 fájl lekérdezése
-$stmt = $conn->prepare($query); // Helyes változó használata
+$stmt = $conn->prepare($query); 
 $stmt->bind_param("i", $projekt_id);
 $stmt->execute();
 $resultMedia = $stmt->get_result();

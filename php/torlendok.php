@@ -1,5 +1,5 @@
 <?php
-@session_start(); // Session indítása
+session_start(); // Session indítása
 
 // Ellenőrizzük, hogy a felhasználó be van-e jelentkezve
 if (!isset($_SESSION['felhasznalonev'])) {
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_files'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Médiafájlok Törlése</title>
-    <link rel="stylesheet" href="../css2/kezdolap.css"> <!-- Külső CSS fájlok -->
+    <link rel="stylesheet" href="../css2/kezdolap.css">
    <!-- <link rel="stylesheet" href="../css/modositas.css">-->
     <style>
         body {
@@ -121,12 +121,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_files'])) {
 
         input[type="submit"]:hover {
             background-color: #218838;
-            /* Sötétebb zöld */
         }
 
         input[type="button"]:hover {
             background-color: #c82333;
-            /* Sötétebb piros */
         }
 
         h2 {
@@ -137,7 +135,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_files'])) {
             display: flex;
             justify-content: center;
             gap: 10px;
-            /* Gombok közötti távolság */
             margin-top: 20px;
         }
     </style>
@@ -149,19 +146,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_files'])) {
         <h2>Összes Médiafájl Törlése</h2>
         <form method="POST" action="torlendok.php?id=<?php echo htmlspecialchars($_GET['id']); ?>"
             onsubmit="return confirmDeletion();">
-            <div class="media-preview">
+            <div class="media-preview">  <!-- Médiafájlok előnézete -->
                 <?php while ($media = $resultMedia->fetch_assoc()): ?>
                     <div class="media-item">
+                        <!-- Kéepk előnézete -->
                         <?php if (strpos($media['fajl_nev'], '.jpg') !== false || strpos($media['fajl_nev'], '.jpeg') !== false || strpos($media['fajl_nev'], '.png') !== false): ?>
                             <img src="../feltoltesek/<?php echo htmlspecialchars($media['fajl_nev']); ?>"
                                 alt="<?php echo htmlspecialchars($media['fajl_nev']); ?>">
+                         <!-- Videók előnézete -->
                         <?php elseif (strpos($media['fajl_nev'], '.mp4') !== false || strpos($media['fajl_nev'], '.webm') !== false): ?>
                             <video controls>
                                 <source src="../feltoltesek/<?php echo htmlspecialchars($media['fajl_nev']); ?>"
                                     type="video/<?php echo pathinfo($media['fajl_nev'], PATHINFO_EXTENSION); ?>">
                                 Your browser does not support the video tag.
                             </video>
-                        <?php else: ?>
+                        <?php else: ?> <!-- Más előnézete -->
                             <p><?php echo htmlspecialchars($media['fajl_nev']); ?></p>
                         <?php endif; ?>
                         <input type="checkbox" name="delete_files[]" value="<?php echo $media['id']; ?>"> Törlés
@@ -177,8 +176,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_files'])) {
     </div>
 
     <script>
-        function confirmDeletion() {
-            var checkboxes = document.querySelectorAll('input[name="delete_files[]"]:checked');
+        function confirmDeletion() { // A fájlok törlésének megerősítése
+            var checkboxes = document.querySelectorAll('input[name="delete_files[]"]:checked'); // Kiválasztja az összes bejelölt checkboxot (a törlésre jelölt fájlokat)
             if (checkboxes.length === 0) {
                 alert("Nincs kiválasztott fájl a törléshez.");
                 return false;

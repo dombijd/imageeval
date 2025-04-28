@@ -1,27 +1,25 @@
 <?php
-@session_start(); // Session indítása
-ob_start(); // Kimenet pufferelése
-
+session_start(); // session indítása
+ob_start(); // kimenet pufferelése
 ?>
 
 <!DOCTYPE html>
-<html lang="hu"> <!-- A dokumentum magyar nyelvű -->
+<html lang="hu">
 <head>
-    <meta charset="UTF-8"> <!-- Az oldal karakterkódolása UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Értékelés - Projektértékelő</title> <!-- Az oldal címe -->
-    <link rel="stylesheet" href="../css2/ertekeles_kitoltok.css?v=1.6"> <!-- Külső CSS fájl hozzáadása -->
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Értékelés - Projektértékelő</title> 
+    <link rel="stylesheet" href="../css2/ertekeles_kitoltok.css?v=1.6">
     <script>
-        // Ellenőrzés a "Tovább" gomb előtt
+        // form ellenőrzés a tovább gomb előtt
         function validateForm() {
-            // Ellenőrizzük, hogy a checkbox be van pipálva
-            var acceptAszf = document.getElementById("accept-aszf").checked;
+            var acceptAszf = document.getElementById("accept-aszf").checked; // ászf pipa ellenőrzés
             if (!acceptAszf) {
                 alert("Az ÁSZF-et el kell fogadni a továbblépéshez!");
                 return false;
             }
-            
-            // Ellenőrizzük, hogy minden kötelező válasz meg van adva
+
+            // kötelező mezők ellenőrzése
             var inputs = document.querySelectorAll('input[required], select[required], textarea[required]');
             for (var i = 0; i < inputs.length; i++) {
                 if (inputs[i].value === "") {
@@ -29,42 +27,39 @@ ob_start(); // Kimenet pufferelése
                     return false;
                 }
             }
-            return true;  // Ha minden oké, tovább léphet
+            return true;
         }
 
+        // dátum mező megjelenítés kezelése legördülő alapján
         function showDateInput(selectElem, questionId) {
             const questionContainer = selectElem.closest('.question-container');
-            let dateInput = questionContainer.querySelector('input[type="date"]');  // Keresünk egy meglévő dátum mezőt
+            let dateInput = questionContainer.querySelector('input[type="date"]'); // dátum keres
 
-            // Ha a választás 'date', akkor megjelenítjük a dátum inputot
             if (selectElem.value === 'date') {
-                // Ha még nincs dátum input mező, akkor létrehozzuk
+                // ha date-t választ
                 if (!dateInput) {
                     dateInput = document.createElement('input');
                     dateInput.setAttribute('type', 'date');
-                    dateInput.name = 'valasz[' + questionId + ']'; // Az input mező neve kérdés ID alapján
-                    dateInput.required = true; // A mező kötelező
-                    questionContainer.appendChild(dateInput); // Hozzáadjuk a kérdés konténeréhez
+                    dateInput.name = 'valasz[' + questionId + ']';
+                    dateInput.required = true;
+                    questionContainer.appendChild(dateInput);
                 }
             } else {
-                // Ha a választás nem 'date', eltávolítjuk a dátum inputot
+                // ha nem date eltávolítjuk
                 if (dateInput) {
                     dateInput.remove();
                 }
             }
         }
 
+        // oldal betöltéskor események hozzárendelése
         document.addEventListener("DOMContentLoaded", function() {
-            // Keresés a legördülő menük között, és minden esetben frissítjük a dátum mezőt
-            const selects = document.querySelectorAll('select');
+            const selects = document.querySelectorAll('select'); // összes select keresése
             selects.forEach(function(select) {
-                const questionId = select.name.match(/\d+/)[0];  // Kivesszük az ID-t a kérdéshez
-                // Megjelenítjük a megfelelő input mezőt (dátum inputot, ha 'date' típusú választ választottak)
-                showDateInput(select, questionId);
-                
-                // Hozzáadjuk az 'onchange' eseményt a legördülő menühöz
+                const questionId = select.name.match(/\d+/)[0]; // kérdés id kiszedése
+                showDateInput(select, questionId); // kezdeti megjelenítés
                 select.addEventListener('change', function() {
-                    showDateInput(select, questionId);
+                    showDateInput(select, questionId); // változás figyelés
                 });
             });
         });
@@ -72,77 +67,80 @@ ob_start(); // Kimenet pufferelése
 </head>
 <body>
     <header>
-        <h1>Az értékelés elkezdése előtt:</h1> <!-- Fő cím -->
+        <h1>Az értékelés elkezdése előtt:</h1> 
     </header>
-    <div class="container"> <!-- A tartalom konténer -->
+
+    <div class="container"> 
+
         <div class="instructions">Kérjük, töltse ki a kitöltés előtt az alábbiakat:</div>
 
-        <!-- ÁSZF link és elfogadás -->
-        <div class="checkbox-container">
+        <div class="checkbox-container"> <!-- ászf elfogadása -->
             <label>
-                <a href="../html/aszf.html" target="_blank" style="padding: 10px;;">Általános Szerződési Feltételek (ÁSZF) elolvasása</a>
+                <a href="../html/aszf.html" target="_blank" style="padding: 10px;">ÁSZF elolvasása</a>
             </label><br>
-            <input type="checkbox" id="accept-aszf" name="accept-aszf" required > 
+            <input type="checkbox" id="accept-aszf" name="accept-aszf" required> 
             <label for="accept-aszf">Elfogadom az ÁSZF-et</label>
         </div>
 
-        <!-- Utasítások a felhasználónak -->
         <?php
-        // Ellenőrizzük, hogy a projekt_id paraméter létezik-e a GET kérésben
-        $projekt_id = isset($_GET['projekt_id']) ? intval($_GET['projekt_id']) : null;  // Projekt azonosító lekérése
+        // projekt_id ellenőrzése
+        $projekt_id = isset($_GET['projekt_id']) ? intval($_GET['projekt_id']) : null;
         if ($projekt_id === null) {
-            echo "Nincs projekt kiválasztva."; // Ha nincs projekt kiválasztva, üzenet jelenik meg
-            exit(); // Kilépés a scriptből
+            echo "Nincs projekt kiválasztva.";
+            exit(); // kilépés ha nincs projekt
         }
-        // Kapcsolódás az adatbázishoz
+
+        // adatb kapcsolódás
         require_once "db_connect.php";
 
-        // Ellenőrizzük, hogy van-e már kitolto_id a session-ben
+        // ellenőrzés van-e már kitöltő session-ben
         if (!isset($_SESSION['kitolto_id_' . $projekt_id])) {
-            // Ha nincs, beszúrjuk az új kitöltőt az adatbázisba
+            // ha nincs, új kitöltő beszúrása
             $insertKitolto = $conn->prepare("INSERT INTO kitoltok (projekt_id) VALUES (?)");
-            $insertKitolto->bind_param("i", $projekt_id);  // Projekt id hozzárendelése
+            $insertKitolto->bind_param("i", $projekt_id);
             if (!$insertKitolto->execute()) {
-                echo "Hiba a kitoltok beszúrása során: " . $insertKitolto->error; // Hiba esetén üzenet
+                echo "Hiba a kitöltő beszúrása során: " . $insertKitolto->error;
                 exit();
             }
-            // Az új kitolto_id lekérése
-            $kitolto_id = $conn->insert_id;
-            // Mentjük a kitolto_id-t a session-be
-            $_SESSION['kitolto_id_' . $projekt_id] = $kitolto_id;
+            $kitolto_id = $conn->insert_id; // új kitöltő id lekérése
+            $_SESSION['kitolto_id_' . $projekt_id] = $kitolto_id; // mentés session-be
             $insertKitolto->close();
         } else {
-            // Ha már létezik, a session-ből vesszük ki
+            // ha már létezik, onnan vesszük
             $kitolto_id = $_SESSION['kitolto_id_' . $projekt_id];
         }
-        // Kérdések lekérdezése az adott projekt_id alapján
-        $sqlKerdezsek = "SELECT * FROM kerdesek WHERE projekt_id = ?";  // SQL lekérdezés a kérdésekhez
+
+        // kérdések lekérése az adott projekthez
+        $sqlKerdezsek = "SELECT * FROM kerdesek WHERE projekt_id = ?";
         $stmt = $conn->prepare($sqlKerdezsek);
-        $stmt->bind_param("i", $projekt_id);  // Projekt id hozzárendelése
-        $stmt->execute();  // Lekérdezés végrehajtása
-        $result = $stmt->get_result();  // Eredmény lekérése
-        // Ellenőrizzük, hogy vannak-e kérdések
+        $stmt->bind_param("i", $projekt_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // ha nincs kérdés
         if ($result->num_rows == 0) {
-            echo '<p>Itt nincs kérdés.</p>';  // Ha nincsenek kérdések, üzenet megjelenítése
+            echo '<p>Itt nincs kérdés.</p>';
         }
-        // Kérdések és válaszok megjelenítése
-        echo '<form action="" method="post" onsubmit="return validateForm()">';  // Form létrehozása
-        while ($row = $result->fetch_assoc()) {  // Minden kérdés végigolvasása
-            $kerdes = htmlspecialchars($row['kerdes']);  // Kérdés kinyerése
-            $required = $row['required'];  // Kötelező kérdés-e (0 vagy 1)
-            // Kérdés megjelenítése
+
+        // űrlap megjelenítése
+        echo '<form action="" method="post" onsubmit="return validateForm()">';
+
+        while ($row = $result->fetch_assoc()) {
+            $kerdes = htmlspecialchars($row['kerdes']);
+            $required = $row['required']; // kötelező-e
             echo '<label>' . $kerdes;
-            // Ha kötelező, adjunk hozzá egy csillagot
             if ($required == 1) {
-                echo ' <span style="color: red;">*</span>';  // Csillag a kötelező kérdésekhez
+                echo ' <span style="color: red;">*</span>'; // ha kötelező, csillag
             }
             echo '</label>';
-            // Válasz típus ellenőrzése
-            $valasz_tipus = $row['valasz_tipus'];
-            echo '<div class="question-container">';  // Konténer a kérdéshez
+
+            $valasz_tipus = $row['valasz_tipus']; // válasz típusa
+            echo '<div class="question-container">';
+
+            // válasz típusok kezelése
             if ($valasz_tipus == 'enum') {
-                // Legördülő menü
-                $lehetseges_valaszok = explode(',', $row['lehetseges_valaszok']);  // Lehetséges válaszok
+                // legördülő menü
+                $lehetseges_valaszok = explode(',', $row['lehetseges_valaszok']);
                 echo '<select name="valasz[' . $row['id'] . ']" onchange="showDateInput(this, ' . $row['id'] . ')"' . ($required == 1 ? ' required' : '') . '>';
                 echo '<option value="">-- Válassz --</option>';
                 foreach ($lehetseges_valaszok as $valasz) {
@@ -150,44 +148,47 @@ ob_start(); // Kimenet pufferelése
                 }
                 echo '</select>';
             } elseif ($valasz_tipus == 'text') {
-                // Szöveges válasz
+                // rövid szöveg
                 echo '<input type="text" name="valasz[' . $row['id'] . ']"' . ($required == 1 ? ' required' : '') . ' placeholder="Írd be a válaszodat...">';
             } elseif ($valasz_tipus == 'int') {
-                // Szám bevitel
+                // szám
                 echo '<input type="number" name="valasz[' . $row['id'] . ']"' . ($required == 1 ? ' required' : '') . ' placeholder="Írd be a számot...">';
             } elseif ($valasz_tipus == 'string') {
-                // Szöveges válasz, ami lehet hosszabb
+                // hosszabb szöveg
                 echo '<textarea name="valasz[' . $row['id'] . ']"' . ($required == 1 ? ' required' : '') . ' placeholder="Írd be a válaszodat..."></textarea>';
             } elseif ($valasz_tipus == 'date') {
+                // dátum beírás
                 echo '<input type="date" name="valasz[' . $row['id'] . ']" min="1900-01-01" max="2020-01-01"' . ($required == 1 ? ' required' : '') . '>';
+            }
 
-            }
-            echo '</div>';
+            echo '</div>'; // question-container vége
         }
-        // Gombok elhelyezése
+
+        // gombok
         echo '<div class="button-container">';
-        echo '<a class="back-button" href="projektek.php">Vissza a projektekhez</a>';  // Vissza link
-        echo '<button class="continue-button" type="submit">Tovább</button>';  // Tovább gomb
+        echo '<a class="back-button" href="projektek.php">Vissza a projektekhez</a>'; // vissza link
+        echo '<button class="continue-button" type="submit">Tovább</button>'; // tovább gomb
         echo '</div>';
-        echo '</form>';  // Form bezárása
-        // Adatok session-be mentése a válaszokkal
+
+        echo '</form>'; // form vége
+
+        // ha elküldték a formot
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            foreach ($_POST['valasz'] as $kerdes_id => $valasz) {  // A válaszok mentése
-                // Mentés session-be
-                $_SESSION['valaszok_' . $projekt_id][$kerdes_id] = $valasz;
+            foreach ($_POST['valasz'] as $kerdes_id => $valasz) {
+                $_SESSION['valaszok_' . $projekt_id][$kerdes_id] = $valasz; // válaszok mentése session-be
             }
-            // Átirányítás a fájlok értékeléséhez
+            // átirányítás fájlok értékeléséhez
             header("Location: fajlok_ertekelese.php?projekt_id=" . $projekt_id . "&current_file=1");
-            exit();  // Kilépés
+            exit();
         }
-        // Zárjuk le a kapcsolatot
-        $stmt->close();  // A kérdések lekérdezése lezárása
-        $conn->close();  // Adatbázis kapcsolat lezárása
+
+        $stmt->close(); // lekérdezés lezárása
+        $conn->close(); // adatb kapcsolat zárása
         ?>
     </div>
 </body>
 </html>
 
 <?php
-ob_end_flush(); // Pufferelt tartalom kiküldése
+ob_end_flush(); // puffer lezárása
 ?>

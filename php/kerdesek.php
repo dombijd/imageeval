@@ -1,5 +1,5 @@
 <?php
-@session_start();
+session_start();
 
 // Ellenőrzés, hogy a felhasználó be van-e jelentkezve
 if (!isset($_SESSION['felhasznalonev'])) {
@@ -10,7 +10,7 @@ if (!isset($_SESSION['felhasznalonev'])) {
 // Kapcsolódás az adatbázishoz
 require_once "db_connect.php";
 
-$messages = []; // Hiba és sikerüzenetek tárolása
+$messages = []; // Üzenetek tárolása
 
 // Kérdések mentése
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -66,16 +66,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="../css/kezdolap.css">
     <link rel="stylesheet" href="../css/reg.css">
     <style>
-        /* Ide jöhetnek a stílusok */
         .message {
             color: red;
-            /* Vagy bármilyen más szín a hibaüzenetekhez */
             margin: 10px 0;
         }
-
         .success {
             color: green;
-            /* A sikerüzenetekhez */
         }
     </style>
     <script>
@@ -149,7 +145,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <form action="kerdesek.php" method="post">
-                <input type="hidden" name="project_id" value="1"> <!-- Állítsd be a megfelelő projekt ID-t -->
+                <input type="hidden" name="project_id" value="1">
                 <h3>Kérdések:</h3>
                 <div id="questions"></div>
                 <button type="button" onclick="addQuestion()">Új kérdés hozzáadása</button>
